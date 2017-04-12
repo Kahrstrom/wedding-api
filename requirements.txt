@@ -12,6 +12,7 @@ gunicorn==19.6.0
 itsdangerous==0.24
 neo4jrestclient==2.1.1
 psycopg2==2.6.2
+py2neo==3.1.2
 requests==2.13.0
 urllib3==1.16
 virtualenv==15.0.3
