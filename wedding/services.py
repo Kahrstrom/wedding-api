@@ -1,5 +1,4 @@
 from py2neo import Graph, authenticate
-from passlib.hash import bcrypt
 import os
 import uuid
 
