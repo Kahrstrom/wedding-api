@@ -2,6 +2,7 @@ from py2neo import Graph, authenticate
 import os
 import uuid
 import smtplib
+from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -56,36 +57,38 @@ class EntryService:
                         MERGE (w:Wedding {1})
                         MERGE (g) -[:ATTENDING] -> (w)
                         RETURN g""".format(
-                            parse_request(request.json),
+                            parse_create_request(request.json),
                             "{name : 'Best wedding ever!'}"
                         )
+                
+                print(query)
                 guest = graph.data(query)
-                send_email(['jonatan.kahrstrom@gmail.com','agnes.tegen@gmail.com'], 
-                    u'Ny gäst till bröllopet!', 
-                    u"""{0} har anmält sig!
-                    Kommentar: {1}
-                    Matpreferenser: {2}
-                    """.format(request.json.get('name',{}),
-                            request.json.get('comment', {}),
-                            request.json.get('food', {}))
-                    )
+                # send_email(['jonatan.kahrstrom@gmail.com','agnes.tegen@gmail.com'], 
+                #     u'Ny gäst till bröllopet!', 
+                #     u"""{0} har anmält sig!
+                #     Kommentar: {1}
+                #     Matpreferenser: {2}
+                #     """.format(request.json.get('name',{}),
+                #             request.json.get('comment', {}),
+                #             request.json.get('food', {}))
+                #     )
                 return True
             else:
                 query = """MATCH (g:Guest)
                         WHERE g.name = '{0}'
                         SET {1}
                         RETURN g
-                        """.format(request.json.get('name',{}), parse_set('g',request.json, ['alcohol','comment','food']))
+                        """.format(request.json.get('name',{}), parse_set('g',merge_two_dicts(request.json, {"timestamp": datetime.now()}), ['alcohol','comment','food', 'timestamp']))
                 guest = graph.data(query)
-                send_email(['jonatan.kahrstrom@gmail.com','agnes.tegen@gmail.com'], 
-                    u'Bröllopsgäst har ändrat sina uppgifter!', 
-                    u"""{0} har uppdaterat uppgifter till:
-                    Kommentar: {1}
-                    Matpreferenser: {2}
-                    """.format(request.json.get('name',{}),
-                            request.json.get('comment', {}),
-                            request.json.get('food', {}))
-                    )
+                # send_email(['jonatan.kahrstrom@gmail.com','agnes.tegen@gmail.com'], 
+                #     u'Bröllopsgäst har ändrat sina uppgifter!', 
+                #     u"""{0} har uppdaterat uppgifter till:
+                #     Kommentar: {1}
+                #     Matpreferenser: {2}
+                #     """.format(request.json.get('name',{}),
+                #             request.json.get('comment', {}),
+                #             request.json.get('food', {}))
+                #     )
                 return True
         except:
             return False
@@ -95,6 +98,28 @@ def parse_set(node,json,keys):
     return ", ".join(values)
 
 
-def parse_request(json):
+def parse_update_request(json):
+    json = merge_two_dicts(
+        json,
+        {"timestamp": datetime.now()}
+    )
     values = ["{0} : '{1}'".format(key, json[key]) for key in json]
     return "{" + ", ".join(values) + "}"
+
+def parse_create_request(json):
+    json = merge_two_dicts(
+        json,
+        {"timestamp": datetime.now()}
+    )
+    json = merge_two_dicts(
+        json,
+        {"createdtime": datetime.now()}
+    )
+    values = ["{0} : '{1}'".format(key, json[key]) for key in json]
+    return "{" + ", ".join(values) + "}"
+
+def merge_two_dicts(x, y):
+    """Given two dicts, merge them into a new dict as a shallow copy."""
+    z = x.copy()
+    z.update(y)
+    return z
