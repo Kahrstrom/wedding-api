@@ -63,15 +63,15 @@ class EntryService:
                 
                 print(query)
                 guest = graph.data(query)
-                # send_email(['jonatan.kahrstrom@gmail.com','agnes.tegen@gmail.com'], 
-                #     u'Ny gäst till bröllopet!', 
-                #     u"""{0} har anmält sig!
-                #     Kommentar: {1}
-                #     Matpreferenser: {2}
-                #     """.format(request.json.get('name',{}),
-                #             request.json.get('comment', {}),
-                #             request.json.get('food', {}))
-                #     )
+                send_email(['jonatan.kahrstrom@gmail.com','agnes.tegen@gmail.com'], 
+                    u'Ny gäst till bröllopet!', 
+                    u"""{0} har anmält sig!
+                    Kommentar: {1}
+                    Matpreferenser: {2}
+                    """.format(request.json.get('name',{}),
+                            request.json.get('comment', {}),
+                            request.json.get('food', {}))
+                    )
                 return True
             else:
                 query = """MATCH (g:Guest)
@@ -80,15 +80,15 @@ class EntryService:
                         RETURN g
                         """.format(request.json.get('name',{}), parse_set('g',merge_two_dicts(request.json, {"timestamp": datetime.now()}), ['alcohol','comment','food', 'timestamp']))
                 guest = graph.data(query)
-                # send_email(['jonatan.kahrstrom@gmail.com','agnes.tegen@gmail.com'], 
-                #     u'Bröllopsgäst har ändrat sina uppgifter!', 
-                #     u"""{0} har uppdaterat uppgifter till:
-                #     Kommentar: {1}
-                #     Matpreferenser: {2}
-                #     """.format(request.json.get('name',{}),
-                #             request.json.get('comment', {}),
-                #             request.json.get('food', {}))
-                #     )
+                send_email(['jonatan.kahrstrom@gmail.com','agnes.tegen@gmail.com'], 
+                    u'Bröllopsgäst har ändrat sina uppgifter!', 
+                    u"""{0} har uppdaterat uppgifter till:
+                    Kommentar: {1}
+                    Matpreferenser: {2}
+                    """.format(request.json.get('name',{}),
+                            request.json.get('comment', {}),
+                            request.json.get('food', {}))
+                    )
                 return True
         except:
             return False
