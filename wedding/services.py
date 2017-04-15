@@ -17,7 +17,6 @@ def send_email(recipient, subject, body):
     username = os.environ.get('SMTPUSER')
     password = os.environ.get('SMTPPW')
     text = MIMEText(body,"plain","utf-8")
-    print(fromaddr)
     message = MIMEMultipart("alternative")
     message['Subject'] = subject
     message['From'] = fromaddr
